@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – AttendEase</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h2>🏢 AttendEase</h2>
+      <p>Admin Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <a class="nav-item active" data-tab="dashboard" onclick="showTab('dashboard')">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <div class="nav-section">Attendance</div>
+      <a class="nav-item" data-tab="today" onclick="showTab('today')">
+        <span class="nav-icon">📅</span> Today's Attendance
+      </a>
+      <a class="nav-item" data-tab="records" onclick="showTab('records')">
+        <span class="nav-icon">📋</span> All Records
+      </a>
+      <a class="nav-item" data-tab="calendar" onclick="showTab('calendar')">
+        <span class="nav-icon">🗓️</span> Calendar View
+      </a>
+      <a class="nav-item" data-tab="summary" onclick="showTab('summary')">
+        <span class="nav-icon">📈</span> Monthly Summary
+      </a>
+      <div class="nav-section">Management</div>
+      <a class="nav-item" data-tab="staff" onclick="showTab('staff')">
+        <span class="nav-icon">👥</span> Staff
+      </a>
+      <a class="nav-item" data-tab="leaves" onclick="showTab('leaves')">
+        <span class="nav-icon">🏖️</span> Leave Requests
+      </a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-info">
+        <div class="avatar" id="adminAvatar"></div>
+        <div>
+          <div class="avatar-name" id="adminName">Admin</div>
+          <div class="avatar-role">Administrator</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px;color:#9ca3af" onclick="logout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="topbar-right">
+        <span id="topDate" class="text-muted"></span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="card">
+            <div class="card-title">🟢 Clocked In Today</div>
+            <div id="presentList"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">⏳ Pending Leaves</div>
+            <div id="pendingLeavesList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TODAY TAB -->
+      <div id="tab-today" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">📅 Today's Attendance</div>
+            <button class="btn btn-outline btn-sm" onclick="loadToday()">🔄 Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Type</th><th>Department</th><th>Clock In</th><th>Clock Out</th><th>Status</th></tr></thead>
+              <tbody id="todayTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECORDS TAB -->
+      <div id="tab-records" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">📋 Attendance Records</div>
+            <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
+          </div>
+          <div class="filter-bar">
+            <select id="recMonth"><option value="">All Months</option></select>
+            <select id="recYear"><option value="">All Years</option></select>
+            <button class="btn btn-primary btn-sm" onclick="loadRecords()">Filter</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Name</th><th>Type</th><th>Department</th><th>Clock In</th><th>Clock Out</th><th>Status</th></tr></thead>
+              <tbody id="recordsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR TAB -->
+      <div id="tab-calendar" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">🗓️ Attendance Calendar</div>
+          </div>
+          <div class="filter-bar">
+            <label>Staff:</label>
+            <select id="calStaffId"></select>
+            <select id="calMonth"></select>
+            <select id="calYear"></select>
+            <button class="btn btn-primary btn-sm" onclick="loadCalendar()">View</button>
+          </div>
+          <div class="card-title" id="calTitle"></div>
+          <div id="calendarGrid"></div>
+        </div>
+      </div>
+
+      <!-- SUMMARY TAB -->
+      <div id="tab-summary" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">📈 Monthly Summary</div>
+            <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
+          </div>
+          <div class="filter-bar">
+            <select id="sumMonth"></select>
+            <select id="sumYear"></select>
+            <button class="btn btn-primary btn-sm" onclick="loadSummary()">View</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Type</th><th>Department</th><th>Present</th><th>Late</th><th>Half-day</th><th>Absent</th><th>Total Days</th></tr></thead>
+              <tbody id="summaryTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF TAB -->
+      <div id="tab-staff" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">👥 Staff Management</div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('addStaffModal')">+ Add Staff</button>
+          </div>
+          <div id="staffAlert"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Department</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="staffTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEAVES TAB -->
+      <div id="tab-leaves" class="tab-content" style="display:none">
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">🏖️ Leave Requests</div>
+          </div>
+          <div id="leaveAlert"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Staff</th><th>Department</th><th>Date</th><th>Type</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="leavesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ADD STAFF MODAL -->
+<div id="addStaffModal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-title">Add New Staff</div>
+    <div id="addStaffAlert"></div>
+    <div class="form-group"><label>Full Name</label><input id="sf_name" placeholder="e.g. Ahmad Razif"></div>
+    <div class="form-group"><label>Email</label><input id="sf_email" type="email" placeholder="email@company.com"></div>
+    <div class="form-group"><label>Password</label><input id="sf_pass" type="password" placeholder="Temporary password"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Staff Type</label>
+        <select id="sf_type"><option value="intern">Intern</option><option value="contract">Contract</option></select>
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <input id="sf_dept" placeholder="e.g. Engineering">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Start Date</label><input id="sf_start" type="date"></div>
+      <div class="form-group"><label>End Date</label><input id="sf_end" type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addStaffModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STAFF MODAL -->
+<div id="editStaffModal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-title">Edit Staff</div>
+    <input type="hidden" id="es_id">
+    <div class="form-group"><label>Full Name</label><input id="es_name"></div>
+    <div class="form-group"><label>Email</label><input id="es_email" type="email"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Staff Type</label>
+        <select id="es_type"><option value="intern">Intern</option><option value="contract">Contract</option></select>
+      </div>
+      <div class="form-group"><label>Department</label><input id="es_dept"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Start Date</label><input id="es_start" type="date"></div>
+      <div class="form-group"><label>End Date</label><input id="es_end" type="date"></div>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="es_active"><option value="1">Active</option><option value="0">Inactive</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('editStaffModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="updateStaff()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+// ── AUTH CHECK ────────────────────────────────────────────────
+const user = getUser();
+if (!user || user.role !== 'admin') window.location.href = 'index.html';
+document.getElementById('adminName').textContent = user?.name || 'Admin';
+document.getElementById('adminAvatar').textContent = (user?.name || 'A').charAt(0).toUpperCase();
+document.getElementById('topDate').textContent = new Date().toLocaleDateString('en-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+// ── MONTH/YEAR SELECTS ────────────────────────────────────────
+function populateMonthYear(mId, yId) {
+  const now = new Date();
+  const mEl = document.getElementById(mId);
+  const yEl = document.getElementById(yId);
+  if (!mEl || !yEl) return;
+  ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m,i) => {
+    mEl.innerHTML += `<option value="${i+1}" ${i+1===now.getMonth()+1?'selected':''}>${m}</option>`;
+  });
+  for (let y = now.getFullYear(); y >= now.getFullYear()-2; y--) {
+    yEl.innerHTML += `<option value="${y}" ${y===now.getFullYear()?'selected':''}>${y}</option>`;
+  }
+}
+function addMonthYearAll(mId, yId) {
+  const now = new Date();
+  const mEl = document.getElementById(mId);
+  const yEl = document.getElementById(yId);
+  if (!mEl || !yEl) return;
+  mEl.innerHTML = '<option value="">All Months</option>';
+  ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m,i) => {
+    mEl.innerHTML += `<option value="${i+1}" ${i+1===now.getMonth()+1?'selected':''}>${m}</option>`;
+  });
+  yEl.innerHTML = '<option value="">All Years</option>';
+  for (let y = now.getFullYear(); y >= now.getFullYear()-2; y--) {
+    yEl.innerHTML += `<option value="${y}" ${y===now.getFullYear()?'selected':''}>${y}</option>`;
+  }
+}
+
+populateMonthYear('sumMonth', 'sumYear');
+addMonthYearAll('recMonth', 'recYear');
+
+// Calendar month/year
+function populateCalMonthYear() {
+  const now = new Date();
+  const mEl = document.getElementById('calMonth');
+  const yEl = document.getElementById('calYear');
+  ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m,i) => {
+    mEl.innerHTML += `<option value="${i+1}" ${i+1===now.getMonth()+1?'selected':''}>${m}</option>`;
+  });
+  for (let y = now.getFullYear(); y >= now.getFullYear()-2; y--) {
+    yEl.innerHTML += `<option value="${y}" ${y===now.getFullYear()?'selected':''}>${y}</option>`;
+  }
+}
+populateCalMonthYear();
+
+// ── TABS ──────────────────────────────────────────────────────
+const tabTitles = { dashboard:'Dashboard', today:"Today's Attendance", records:'All Records', calendar:'Calendar View', summary:'Monthly Summary', staff:'Staff Management', leaves:'Leave Requests' };
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  document.querySelector(`[data-tab="${name}"]`).classList.add('active');
+  document.getElementById('pageTitle').textContent = tabTitles[name];
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'today') loadToday();
+  if (name === 'records') loadRecords();
+  if (name === 'staff') loadStaff();
+  if (name === 'leaves') loadLeaves();
+  if (name === 'summary') loadSummary();
+  if (name === 'calendar') loadCalendarStaffList();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
+  const d = await apiFetch('/dashboard');
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card green"><div class="stat-value">${d.present}</div><div class="stat-label">Present Today</div></div>
+    <div class="stat-card yellow"><div class="stat-value">${d.late}</div><div class="stat-label">Late Today</div></div>
+    <div class="stat-card red"><div class="stat-value">${d.absent}</div><div class="stat-label">Absent Today</div></div>
+    <div class="stat-card"><div class="stat-value">${d.totalStaff}</div><div class="stat-label">Total Staff</div></div>
+    <div class="stat-card purple"><div class="stat-value">${d.pendingLeaves}</div><div class="stat-label">Pending Leaves</div></div>
+  `;
+  const td = await apiFetch('/attendance/today');
+  const presentHtml = td.records.length
+    ? td.records.map(r => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+        <div><strong>${r.name}</strong> <span class="text-muted">${r.department || ''}</span></div>
+        <div style="display:flex;gap:8px;align-items:center">${statusBadge(r.status)} <span class="text-muted">${formatTime(r.clock_in)}</span></div>
+      </div>`).join('')
+    : '<div class="empty-state"><div>No one has clocked in yet</div></div>';
+  document.getElementById('presentList').innerHTML = presentHtml;
+
+  const leaves = await apiFetch('/leaves');
+  const pending = leaves.filter(l => l.status === 'pending');
+  document.getElementById('pendingLeavesList').innerHTML = pending.length
+    ? pending.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+        <div><strong>${l.name}</strong><div class="text-muted">${formatDate(l.date)} – ${l.type}</div></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-success btn-sm" onclick="reviewLeave(${l.id},'approved')">✅</button>
+          <button class="btn btn-danger btn-sm" onclick="reviewLeave(${l.id},'rejected')">❌</button>
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state"><div>No pending requests</div></div>';
+}
+
+// ── TODAY ─────────────────────────────────────────────────────
+async function loadToday() {
+  const d = await apiFetch('/attendance/today');
+  const allIds = new Set(d.records.map(r => r.user_id));
+  let rows = d.records.map(r => `<tr>
+    <td><strong>${r.name}</strong></td>
+    <td>${typeBadge(r.staff_type)}</td>
+    <td>${r.department||'—'}</td>
+    <td>${formatTime(r.clock_in)}</td>
+    <td>${formatTime(r.clock_out)}</td>
+    <td>${statusBadge(r.status)}</td>
+  </tr>`).join('');
+  d.allStaff.filter(s => !allIds.has(s.id)).forEach(s => {
+    rows += `<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${typeBadge(s.staff_type)}</td>
+      <td>${s.department||'—'}</td>
+      <td>—</td><td>—</td>
+      <td>${statusBadge('absent')}</td>
+    </tr>`;
+  });
+  document.getElementById('todayTable').innerHTML = rows || '<tr><td colspan="6" class="empty-state">No staff found</td></tr>';
+}
+
+// ── RECORDS ───────────────────────────────────────────────────
+async function loadRecords() {
+  const m = document.getElementById('recMonth').value;
+  const y = document.getElementById('recYear').value;
+  const q = m && y ? `?month=${m}&year=${y}` : '';
+  const rows = await apiFetch('/attendance/all' + q);
+  document.getElementById('recordsTable').innerHTML = rows.length
+    ? rows.map(r => `<tr>
+        <td>${formatDate(r.date)}</td>
+        <td><strong>${r.name}</strong></td>
+        <td>${typeBadge(r.staff_type)}</td>
+        <td>${r.department||'—'}</td>
+        <td>${formatTime(r.clock_in)}</td>
+        <td>${formatTime(r.clock_out)}</td>
+        <td>${statusBadge(r.status)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" class="empty-state">No records found</td></tr>';
+}
+
+async function exportCSV() {
+  const m = document.getElementById('recMonth')?.value || document.getElementById('sumMonth')?.value;
+  const y = document.getElementById('recYear')?.value || document.getElementById('sumYear')?.value;
+  const q = m && y ? `?month=${m}&year=${y}` : '';
+  window.open(`http://localhost:3000/api/attendance/export${q}`, '_blank');
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────
+async function loadCalendarStaffList() {
+  const staff = await apiFetch('/staff');
+  const sel = document.getElementById('calStaffId');
+  sel.innerHTML = staff.map(s => `<option value="${s.id}">${s.name} (${s.staff_type})</option>`).join('');
+  loadCalendar();
+}
+
+async function loadCalendar() {
+  const userId = document.getElementById('calStaffId').value;
+  const month = document.getElementById('calMonth').value;
+  const year = document.getElementById('calYear').value;
+  if (!userId || !month || !year) return;
+  const records = await apiFetch(`/attendance/my?user_id=${userId}&month=${month}&year=${year}`);
+  const staffName = document.getElementById('calStaffId').selectedOptions[0]?.text || '';
+  document.getElementById('calTitle').textContent = `${staffName} — ${MONTHS[month-1]} ${year}`;
+  renderCalendar('calendarGrid', parseInt(year), parseInt(month), records);
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────
+async function loadSummary() {
+  const m = document.getElementById('sumMonth').value;
+  const y = document.getElementById('sumYear').value;
+  const rows = await apiFetch(`/attendance/summary?month=${m}&year=${y}`);
+  document.getElementById('summaryTable').innerHTML = rows.length
+    ? rows.map(r => `<tr>
+        <td><strong>${r.name}</strong></td>
+        <td>${typeBadge(r.staff_type)}</td>
+        <td>${r.department||'—'}</td>
+        <td><span style="color:var(--success);font-weight:700">${r.present||0}</span></td>
+        <td><span style="color:var(--warning);font-weight:700">${r.late||0}</span></td>
+        <td><span style="color:var(--info);font-weight:700">${r.halfday||0}</span></td>
+        <td><span style="color:var(--danger);font-weight:700">${r.absent||0}</span></td>
+        <td>${r.total_days||0}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="8" class="empty-state">No data found</td></tr>';
+}
+
+// ── STAFF ─────────────────────────────────────────────────────
+async function loadStaff() {
+  const staff = await apiFetch('/staff');
+  document.getElementById('staffTable').innerHTML = staff.map(s => `<tr>
+    <td><strong>${s.name}</strong></td>
+    <td>${s.email}</td>
+    <td>${typeBadge(s.staff_type)}</td>
+    <td>${s.department||'—'}</td>
+    <td>${formatDate(s.start_date)}</td>
+    <td>${formatDate(s.end_date)}</td>
+    <td><span class="badge ${s.active?'badge-present':'badge-absent'}">${s.active?'Active':'Inactive'}</span></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="editStaff(${JSON.stringify(s).replace(/"/g,'&quot;')})">✏️ Edit</button></td>
+  </tr>`).join('');
+}
+
+async function addStaff() {
+  try {
+    await apiFetch('/staff', { method:'POST', body: {
+      name: document.getElementById('sf_name').value,
+      email: document.getElementById('sf_email').value,
+      password: document.getElementById('sf_pass').value,
+      staff_type: document.getElementById('sf_type').value,
+      department: document.getElementById('sf_dept').value,
+      start_date: document.getElementById('sf_start').value,
+      end_date: document.getElementById('sf_end').value
+    }});
+    closeModal('addStaffModal');
+    showAlert('staffAlert', 'Staff added successfully!');
+    loadStaff();
+  } catch(e) { showAlert('addStaffAlert', e.message, 'error'); }
+}
+
+function editStaff(s) {
+  document.getElementById('es_id').value = s.id;
+  document.getElementById('es_name').value = s.name;
+  document.getElementById('es_email').value = s.email;
+  document.getElementById('es_type').value = s.staff_type;
+  document.getElementById('es_dept').value = s.department || '';
+  document.getElementById('es_start').value = s.start_date || '';
+  document.getElementById('es_end').value = s.end_date || '';
+  document.getElementById('es_active').value = s.active;
+  openModal('editStaffModal');
+}
+
+async function updateStaff() {
+  const id = document.getElementById('es_id').value;
+  try {
+    await apiFetch(`/staff/${id}`, { method:'PUT', body: {
+      name: document.getElementById('es_name').value,
+      email: document.getElementById('es_email').value,
+      staff_type: document.getElementById('es_type').value,
+      department: document.getElementById('es_dept').value,
+      start_date: document.getElementById('es_start').value,
+      end_date: document.getElementById('es_end').value,
+      active: document.getElementById('es_active').value
+    }});
+    closeModal('editStaffModal');
+    showAlert('staffAlert', 'Staff updated!');
+    loadStaff();
+  } catch(e) { alert(e.message); }
+}
+
+// ── LEAVES ────────────────────────────────────────────────────
+async function loadLeaves() {
+  const leaves = await apiFetch('/leaves');
+  document.getElementById('leavesTable').innerHTML = leaves.length
+    ? leaves.map(l => `<tr>
+        <td><strong>${l.name}</strong></td>
+        <td>${l.department||'—'}</td>
+        <td>${formatDate(l.date)}</td>
+        <td><span class="badge badge-pending">${l.type}</span></td>
+        <td>${l.reason||'—'}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td>${l.status==='pending'?`<div style="display:flex;gap:4px">
+          <button class="btn btn-success btn-sm" onclick="reviewLeave(${l.id},'approved')">Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="reviewLeave(${l.id},'rejected')">Reject</button>
+        </div>`:'—'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" class="empty-state">No leave requests</td></tr>';
+}
+
+async function reviewLeave(id, status) {
+  try {
+    await apiFetch(`/leaves/${id}`, { method:'PUT', body: { status } });
+    showAlert('leaveAlert', `Leave ${status} successfully!`);
+    loadLeaves();
+    loadDashboard();
+  } catch(e) { alert(e.message); }
+}
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>
