@@ -1,6 +1,6 @@
 # 🏢 AttendEase – Intern & Contract Staff Attendance System
 
-A lightweight attendance management system for small companies.
+An attendance management system for small companies.
 
 ## Tech Stack
 - **Backend:** Node.js + Express + sql.js (SQLite, zero native deps)
