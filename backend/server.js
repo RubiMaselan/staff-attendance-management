@@ -6,7 +6,8 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { stringify } = require('csv-stringify/sync');
 
-const JWT_SECRET = 'attendance_secret_2024';
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 const DB_FILE = path.join(__dirname, 'attendance.db');
 
 app.use(helmet());

@@ -50,7 +50,10 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--gray-100);
 .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
 .nav-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--gray-500); }
 .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--gray-400); cursor: pointer; border-radius: 6px; margin: 1px 8px; transition: all .15s; font-size: 13px; text-decoration: none; }
-.nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-item:hover {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+}
 .nav-item.active { background: var(--primary); color: #fff; }
 .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
 button.nav-item {
