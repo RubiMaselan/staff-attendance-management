@@ -102,9 +102,19 @@
             <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
           </div>
           <div class="filter-bar">
-            <select id="recMonth"><option value="">All Months</option></select>
-            <select id="recYear"><option value="">All Years</option></select>
-            <button class="btn btn-primary btn-sm" onclick="loadRecords()">Filter</button>
+            <label for="recMonth">Month</label>
+<select id="recMonth">
+    <option value="">All Months</option>
+</select>
+
+<label for="recYear">Year</label>
+<select id="recYear">
+    <option value="">All Years</option>
+</select>
+
+<button class="btn btn-primary btn-sm" onclick="loadRecords()">
+    Filter
+</button>
           </div>
           <div class="table-wrap">
             <table>
@@ -122,10 +132,14 @@
             <div class="section-title">🗓️ Attendance Calendar</div>
           </div>
           <div class="filter-bar">
-            <label>Staff:</label>
-            <select id="calStaffId"></select>
-            <select id="calMonth"></select>
-            <select id="calYear"></select>
+            <label for="calStaffId">Staff:</label>
+<select id="calStaffId"></select>
+
+<label for="calMonth">Month</label>
+<select id="calMonth"></select>
+
+<label for="calYear">Year</label>
+<select id="calYear"></select>
             <button class="btn btn-primary btn-sm" onclick="loadCalendar()">View</button>
           </div>
           <div class="card-title" id="calTitle"></div>
@@ -141,8 +155,11 @@
             <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
           </div>
           <div class="filter-bar">
-            <select id="sumMonth"></select>
-            <select id="sumYear"></select>
+            <label for="sumMonth">Month</label>
+<select id="sumMonth"></select>
+
+<label for="sumYear">Year</label>
+<select id="sumYear"></select>
             <button class="btn btn-primary btn-sm" onclick="loadSummary()">View</button>
           </div>
           <div class="table-wrap">
@@ -196,22 +213,45 @@
   <div class="modal">
     <div class="modal-title">Add New Staff</div>
     <div id="addStaffAlert"></div>
-    <div class="form-group"><label>Full Name</label><input id="sf_name" placeholder="e.g. Ahmad Razif"></div>
-    <div class="form-group"><label>Email</label><input id="sf_email" type="email" placeholder="email@company.com"></div>
-    <div class="form-group"><label>Password</label><input id="sf_pass" type="password" placeholder="Temporary password"></div>
+    <div class="form-group">
+    <label for="sf_name">Full Name</label>
+    <input id="sf_name" type="text" placeholder="e.g. Ahmad Razif">
+</div>
+
+<div class="form-group">
+    <label for="sf_email">Email</label>
+    <input id="sf_email" type="email" placeholder="email@company.com">
+</div>
+
+<div class="form-group">
+    <label for="sf_pass">Password</label>
+    <input id="sf_pass" type="password" placeholder="Temporary password">
+</div>
     <div class="form-row">
       <div class="form-group">
-        <label>Staff Type</label>
-        <select id="sf_type"><option value="intern">Intern</option><option value="contract">Contract</option></select>
-      </div>
-      <div class="form-group">
-        <label>Department</label>
-        <input id="sf_dept" placeholder="e.g. Engineering">
+    <label for="sf_type">Staff Type</label>
+    <select id="sf_type">
+        <option value="intern">Intern</option>
+        <option value="contract">Contract</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="sf_dept">Department</label>
+    <input id="sf_dept" placeholder="e.g. Engineering">
+</div>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Start Date</label><input id="sf_start" type="date"></div>
-      <div class="form-group"><label>End Date</label><input id="sf_end" type="date"></div>
+      <div class="form-group">
+    <label for="sf_start">Start Date</label>
+    <input id="sf_start" type="date">
+</div>
+
+<div class="form-group">
+    <label for="sf_end">End Date</label>
+    <input id="sf_end" type="date">
+</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('addStaffModal')">Cancel</button>
