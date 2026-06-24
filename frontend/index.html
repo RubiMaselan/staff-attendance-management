@@ -15,12 +15,12 @@
   </div>
   <form id="loginForm">
     <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" placeholder="Enter your email" required>
+      <label for="email">Email</label>
+<input type="email" id="email" placeholder="Enter your email" required>
     </div>
     <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="Enter your password" required>
+      <label for="password">Password</label>
+<input type="password" id="password" placeholder="Enter your password" required>
     </div>
     <div id="loginError" class="alert alert-error" style="display:none"></div>
     <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
@@ -51,7 +51,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(data.error);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
-    window.location.href = data.user.role === 'admin' ? 'admin.html' : 'staff.html';
+    globalThis.location.href = data.user.role === 'admin'
+  ? 'admin.html'
+  : 'staff.html';
   } catch (e) {
     err.textContent = e.message;
     err.style.display = 'block';
@@ -61,7 +63,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
 // Redirect if already logged in
 const user = JSON.parse(localStorage.getItem('user') || 'null');
-if (user) window.location.href = user.role === 'admin' ? 'admin.html' : 'staff.html';
+globalThis.location.href = data.user.role === 'admin'
+  ? 'admin.html'
+  : 'staff.html';
 </script>
 </body>
 </html>

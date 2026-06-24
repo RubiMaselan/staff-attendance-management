@@ -265,23 +265,50 @@
   <div class="modal">
     <div class="modal-title">Edit Staff</div>
     <input type="hidden" id="es_id">
-    <div class="form-group"><label>Full Name</label><input id="es_name"></div>
-    <div class="form-group"><label>Email</label><input id="es_email" type="email"></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Staff Type</label>
-        <select id="es_type"><option value="intern">Intern</option><option value="contract">Contract</option></select>
-      </div>
-      <div class="form-group"><label>Department</label><input id="es_dept"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Start Date</label><input id="es_start" type="date"></div>
-      <div class="form-group"><label>End Date</label><input id="es_end" type="date"></div>
-    </div>
     <div class="form-group">
-      <label>Status</label>
-      <select id="es_active"><option value="1">Active</option><option value="0">Inactive</option></select>
-    </div>
+  <label for="es_name">Full Name</label>
+  <input id="es_name" type="text">
+</div>
+
+<div class="form-group">
+  <label for="es_email">Email</label>
+  <input id="es_email" type="email">
+</div>
+
+<div class="form-row">
+  <div class="form-group">
+    <label for="es_type">Staff Type</label>
+    <select id="es_type">
+      <option value="intern">Intern</option>
+      <option value="contract">Contract</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="es_dept">Department</label>
+    <input id="es_dept" type="text">
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="form-group">
+    <label for="es_start">Start Date</label>
+    <input id="es_start" type="date">
+  </div>
+
+  <div class="form-group">
+    <label for="es_end">End Date</label>
+    <input id="es_end" type="date">
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="es_active">Status</label>
+  <select id="es_active">
+    <option value="1">Active</option>
+    <option value="0">Inactive</option>
+  </select>
+</div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('editStaffModal')">Cancel</button>
       <button class="btn btn-primary" onclick="updateStaff()">Save Changes</button>
@@ -290,13 +317,34 @@
 </div>
 
 <script src="app.js"></script>
-<script>
+<script type="module">
 // ── AUTH CHECK ────────────────────────────────────────────────
 const user = getUser();
-if (!user || user.role !== 'admin') window.location.href = 'index.html';
-document.getElementById('adminName').textContent = user?.name || 'Admin';
-document.getElementById('adminAvatar').textContent = (user?.name || 'A').charAt(0).toUpperCase();
-document.getElementById('topDate').textContent = new Date().toLocaleDateString('en-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+if (!user || user.role !== 'admin') {
+  globalThis.location.href = 'index.html';
+} else {
+  const adminNameEl = document.getElementById('adminName');
+  const adminAvatarEl = document.getElementById('adminAvatar');
+  const topDateEl = document.getElementById('topDate');
+
+  if (adminNameEl) {
+    adminNameEl.textContent = user.name || 'Admin';
+  }
+
+  if (adminAvatarEl) {
+    adminAvatarEl.textContent = (user.name || 'A').charAt(0).toUpperCase();
+  }
+
+  if (topDateEl) {
+    topDateEl.textContent = new Date().toLocaleDateString('en-MY', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+}
 
 // ── MONTH/YEAR SELECTS ────────────────────────────────────────
 function populateMonthYear(mId, yId) {
@@ -385,8 +433,8 @@ async function loadDashboard() {
     ? pending.map(l => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100)">
         <div><strong>${l.name}</strong><div class="text-muted">${formatDate(l.date)} – ${l.type}</div></div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-success btn-sm" onclick="reviewLeave(${l.id},'approved')">✅</button>
-          <button class="btn btn-danger btn-sm" onclick="reviewLeave(${l.id},'rejected')">❌</button>
+          <button class="btn btn-success btn-sm review-btn" data-id="${l.id}" data-status="approved">✅</button>
+<button class="btn btn-danger btn-sm review-btn" data-id="${l.id}" data-status="rejected">❌</button>
         </div>
       </div>`).join('')
     : '<div class="empty-state"><div>No pending requests</div></div>';
@@ -458,7 +506,12 @@ async function loadCalendar() {
   const records = await apiFetch(`/attendance/my?user_id=${userId}&month=${month}&year=${year}`);
   const staffName = document.getElementById('calStaffId').selectedOptions[0]?.text || '';
   document.getElementById('calTitle').textContent = `${staffName} — ${MONTHS[month-1]} ${year}`;
-  renderCalendar('calendarGrid', parseInt(year), parseInt(month), records);
+  renderCalendar(
+  'calendarGrid',
+  Number.parseInt(year, 10),
+  Number.parseInt(month, 10),
+  records
+);
 }
 
 // ── SUMMARY ───────────────────────────────────────────────────
@@ -491,8 +544,8 @@ async function loadStaff() {
     <td>${formatDate(s.start_date)}</td>
     <td>${formatDate(s.end_date)}</td>
     <td><span class="badge ${s.active?'badge-present':'badge-absent'}">${s.active?'Active':'Inactive'}</span></td>
-    <td><button class="btn btn-ghost btn-sm" onclick="editStaff(${JSON.stringify(s).replace(/"/g,'&quot;')})">✏️ Edit</button></td>
-  </tr>`).join('');
+    <td><button class="btn btn-ghost btn-sm edit-btn" data-staff='${JSON.stringify(s)}'>✏️ Edit</button></td>
+   </tr>`).join('');
 }
 
 async function addStaff() {
@@ -512,7 +565,9 @@ async function addStaff() {
   } catch(e) { showAlert('addStaffAlert', e.message, 'error'); }
 }
 
-function editStaff(s) {
+function editStaff(id) {
+  const s = staffList.find(x => x.id === id);
+
   document.getElementById('es_id').value = s.id;
   document.getElementById('es_name').value = s.name;
   document.getElementById('es_email').value = s.email;
@@ -521,6 +576,7 @@ function editStaff(s) {
   document.getElementById('es_start').value = s.start_date || '';
   document.getElementById('es_end').value = s.end_date || '';
   document.getElementById('es_active').value = s.active;
+
   openModal('editStaffModal');
 }
 
@@ -554,8 +610,8 @@ async function loadLeaves() {
         <td>${l.reason||'—'}</td>
         <td>${statusBadge(l.status)}</td>
         <td>${l.status==='pending'?`<div style="display:flex;gap:4px">
-          <button class="btn btn-success btn-sm" onclick="reviewLeave(${l.id},'approved')">Approve</button>
-          <button class="btn btn-danger btn-sm" onclick="reviewLeave(${l.id},'rejected')">Reject</button>
+         <button class="btn btn-success btn-sm review-btn" data-id="${l.id}" data-status="approved">Approve</button>
+<button class="btn btn-danger btn-sm review-btn" data-id="${l.id}" data-status="rejected">Reject</button>
         </div>`:'—'}</td>
       </tr>`).join('')
     : '<tr><td colspan="7" class="empty-state">No leave requests</td></tr>';
@@ -570,8 +626,21 @@ async function reviewLeave(id, status) {
   } catch(e) { alert(e.message); }
 }
 
+// Event delegation
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('edit-btn')) {
+    const staff = JSON.parse(e.target.dataset.staff);
+    editStaff(staff);
+  }
+  if (e.target.classList.contains('review-btn')) {
+    const id = e.target.dataset.id;
+    const status = e.target.dataset.status;
+    reviewLeave(id, status);
+  }
+});
+
 // Init
-loadDashboard();
+await loadDashboard();
 </script>
 </body>
 </html>

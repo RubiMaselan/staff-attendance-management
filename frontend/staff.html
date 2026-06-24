@@ -15,21 +15,26 @@
       <p>Staff Portal</p>
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-section">Attendance</div>
-      <a class="nav-item active" data-tab="clockin" onclick="showTab('clockin')">
-        <span class="nav-icon">🕐</span> Clock In/Out
-      </a>
-      <a class="nav-item" data-tab="history" onclick="showTab('history')">
-        <span class="nav-icon">📋</span> My History
-      </a>
-      <a class="nav-item" data-tab="calendar" onclick="showTab('calendar')">
-        <span class="nav-icon">🗓️</span> My Calendar
-      </a>
-      <div class="nav-section">Leave</div>
-      <a class="nav-item" data-tab="leaves" onclick="showTab('leaves')">
-        <span class="nav-icon">🏖️</span> My Leaves
-      </a>
-    </nav>
+  <div class="nav-section">Attendance</div>
+
+  <button class="nav-item active" data-tab="clockin" onclick="showTab('clockin')">
+    <span class="nav-icon">🕐</span> Clock In/Out
+  </button>
+
+  <button class="nav-item" data-tab="history" onclick="showTab('history')">
+    <span class="nav-icon">📋</span> My History
+  </button>
+
+  <button class="nav-item" data-tab="calendar" onclick="showTab('calendar')">
+    <span class="nav-icon">🗓️</span> My Calendar
+  </button>
+
+  <div class="nav-section">Leave</div>
+
+  <button class="nav-item" data-tab="leaves" onclick="showTab('leaves')">
+    <span class="nav-icon">🏖️</span> My Leaves
+  </button>
+</nav>
     <div class="sidebar-user">
       <div class="sidebar-user-info">
         <div class="avatar" id="staffAvatar"></div>
@@ -86,8 +91,11 @@
             <div class="section-title">📋 Attendance History</div>
           </div>
           <div class="filter-bar">
-            <select id="histMonth"></select>
-            <select id="histYear"></select>
+            <label for="histMonth">Month</label>
+<select id="histMonth"></select>
+
+<label for="histYear">Year</label>
+<select id="histYear"></select>
             <button class="btn btn-primary btn-sm" onclick="loadHistory()">Filter</button>
           </div>
           <div class="table-wrap">
@@ -106,8 +114,11 @@
             <div class="section-title">🗓️ My Attendance Calendar</div>
           </div>
           <div class="filter-bar">
-            <select id="calMonth"></select>
-            <select id="calYear"></select>
+            <label for="calMonth">Month</label>
+<select id="calMonth"></select>
+
+<label for="calYear">Year</label>
+<select id="calYear"></select>
             <button class="btn btn-primary btn-sm" onclick="loadMyCalendar()">View</button>
           </div>
           <div class="card-title" id="calTitle" style="margin-bottom:12px"></div>
@@ -142,22 +153,24 @@
     <div class="modal-title">Request Leave</div>
     <div id="leaveModalAlert"></div>
     <div class="form-group">
-      <label>Date</label>
-      <input id="lv_date" type="date">
-    </div>
-    <div class="form-group">
-      <label>Leave Type</label>
-      <select id="lv_type">
-        <option value="Medical">Medical</option>
-        <option value="Emergency">Emergency</option>
-        <option value="Personal">Personal</option>
-        <option value="Annual">Annual</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Reason (optional)</label>
-      <textarea id="lv_reason" placeholder="Describe your reason..."></textarea>
-    </div>
+  <label for="lv_date">Date</label>
+  <input id="lv_date" type="date">
+</div>
+
+<div class="form-group">
+  <label for="lv_type">Leave Type</label>
+  <select id="lv_type">
+    <option value="Medical">Medical</option>
+    <option value="Emergency">Emergency</option>
+    <option value="Personal">Personal</option>
+    <option value="Annual">Annual</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label for="lv_reason">Reason (optional)</label>
+  <textarea id="lv_reason" placeholder="Describe your reason..."></textarea>
+</div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('leaveModal')">Cancel</button>
       <button class="btn btn-primary" onclick="submitLeave()">Submit</button>
@@ -166,10 +179,10 @@
 </div>
 
 <script src="app.js"></script>
-<script>
+<script type="module">
 // ── AUTH CHECK ────────────────────────────────────────────────
 const user = getUser();
-if (!user) window.location.href = 'index.html';
+if (!user) globalThis.location.href = 'index.html';
 document.getElementById('staffName').textContent = user?.name || 'Staff';
 document.getElementById('staffAvatar').textContent = (user?.name || 'S').charAt(0).toUpperCase();
 document.getElementById('staffType').textContent = user?.staff_type || 'Staff';
@@ -221,12 +234,19 @@ function showTab(name) {
 async function loadTodayStatus() {
   const d = await apiFetch('/attendance/today');
   const r = d.record;
-  const statusHtml = r
-    ? `${statusBadge(r.status)} &nbsp;In: <strong>${formatTime(r.clock_in)}</strong>${r.clock_out ? ` &nbsp;Out: <strong>${formatTime(r.clock_out)}</strong>` : ''}`
-    : `<span class="badge badge-absent">Not clocked in</span>`;
+
+  const outTime = r?.clock_out
+    ? ` &nbsp;Out: <strong>${formatTime(r.clock_out)}</strong>`
+    : '';
+
+  const statusHtml =
+    `${statusBadge(r.status)} &nbsp;In: <strong>${formatTime(r.clock_in)}</strong>${outTime}`;
+
   document.getElementById('todayStatus').innerHTML = statusHtml;
+
   document.getElementById('btnClockIn').disabled = !!(r?.clock_in);
   document.getElementById('btnClockOut').disabled = !(r?.clock_in) || !!(r?.clock_out);
+
 
   // Month stats
   const now = new Date();
@@ -280,8 +300,8 @@ async function loadHistory() {
 
 // ── CALENDAR ──────────────────────────────────────────────────
 async function loadMyCalendar() {
-  const month = parseInt(document.getElementById('calMonth').value);
-  const year = parseInt(document.getElementById('calYear').value);
+  const month = Number.parseInt(document.getElementById('calMonth').value);
+const year  = Number.parseInt(document.getElementById('calYear').value);
   const records = await apiFetch(`/attendance/my?month=${month}&year=${year}`);
   document.getElementById('calTitle').textContent = `${MONTHS[month-1]} ${year}`;
   renderCalendar('calendarGrid', year, month, records);
@@ -314,7 +334,7 @@ async function submitLeave() {
 }
 
 // Init
-loadTodayStatus();
+await loadTodayStatus();
 </script>
 </body>
 </html>

@@ -6,7 +6,7 @@ function getUser() { return JSON.parse(localStorage.getItem('user') || 'null'); 
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = 'index.html';
+  globalThis.location.href = 'index.html';
 }
 
 async function apiFetch(path, opts = {}) {
@@ -15,7 +15,7 @@ async function apiFetch(path, opts = {}) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + getToken(),
-      ...(opts.headers || {})
+      ...opts.headers
     },
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
