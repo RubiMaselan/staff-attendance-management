@@ -2,15 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const path = require('path');
-const fs = require('fs');
+const path = require('node:path');
+const fs = require('node:fs');
 const { stringify } = require('csv-stringify/sync');
 
 const JWT_SECRET = 'attendance_secret_2024';
 const DB_FILE = path.join(__dirname, 'attendance.db');
 
-const app = express();
-app.use(cors());
+app.use(helmet());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
@@ -186,8 +185,8 @@ app.post('/api/attendance/clockin', auth, (req, res) => {
   if (existing.length && existing[0].clock_in) return res.status(400).json({ error: 'Already clocked in today' });
 
   // Late if after 9:00 AM
-  const hour = parseInt(now.slice(0, 2));
-  const min = parseInt(now.slice(3, 5));
+  const hour = Number.parseInt(now.slice(0, 2), 10);
+const min = Number.parseInt(now.slice(3, 5), 10);
   const isLate = hour > 9 || (hour === 9 && min > 0);
   const status = isLate ? 'late' : 'present';
 
@@ -207,13 +206,23 @@ app.post('/api/attendance/clockout', auth, (req, res) => {
   if (existing[0].clock_out) return res.status(400).json({ error: 'Already clocked out' });
 
   // Half-day if less than 4 hours
-  const clockInParts = existing[0].clock_in.split(':');
-  const clockInMins = parseInt(clockInParts[0]) * 60 + parseInt(clockInParts[1]);
-  const nowParts = now.split(':');
-  const nowMins = parseInt(nowParts[0]) * 60 + parseInt(nowParts[1]);
-  const worked = nowMins - clockInMins;
-  let status = existing[0].status;
-  if (worked < 240) status = 'half-day';
+  const clockInMins =
+  Number.parseInt(clockInParts[0], 10) * 60 +
+  Number.parseInt(clockInParts[1], 10);
+
+const nowParts = now.split(':');
+
+const nowMins =
+  Number.parseInt(nowParts[0], 10) * 60 +
+  Number.parseInt(nowParts[1], 10);
+
+const worked = nowMins - clockInMins;
+
+let status = existing[0].status;
+
+if (worked < 240) {
+  status = 'half-day';
+}
 
   run('UPDATE attendance SET clock_out=?, status=? WHERE user_id=? AND date=?', [now, status, req.user.id, today]);
   res.json({ message: 'Clocked out', time: now, worked_minutes: worked });

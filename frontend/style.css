@@ -53,11 +53,21 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--gray-100);
 .nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
 .nav-item.active { background: var(--primary); color: #fff; }
 .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+button.nav-item {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+}
 .sidebar-user { padding: 16px; border-top: 1px solid rgba(255,255,255,.1); }
 .sidebar-user-info { display: flex; align-items: center; gap: 10px; }
 .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0; }
 .avatar-name { font-size: 13px; font-weight: 500; }
 .avatar-role { font-size: 11px; color: var(--gray-400); text-transform: capitalize; }
+
 
 /* Main Content */
 .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
